@@ -10,7 +10,11 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
-
+const employeeList = ["Manager","Intern", "Engineer"]
+const allManagers = [];
+const allInterns = [];
+const allEngineers = [];
+const allEmployees = [];
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
@@ -36,11 +40,180 @@ const render = require("./lib/htmlRenderer");
 // for the provided `render` function to work! ```
 
 async function init() {
-    const { name } = await inquirer.prompt({
-        input:"text",
-        message: questions[0],
-        name: "name"
-      });
+    const{employeeType} = await inquirer.prompt({
+        type: "list",
+        message:"Which type of employee do you want?",
+        name: "employeeType",
+        choices: employeeList
+    })
+    if(employeeType=== employeeList[0]){
+        addManager();
+    }
+    if(employeeType=== employeeList[1]){
+        addIntern();
+    }
+    if(employeeType=== employeeList[2]){
+        addEngineer();
+    }
+}
 
+// List of questions for creating employees of each class
+const prompts = ["what is the employee's name: "
+,"What is the employee's id number"
+,"What is the employee's email address: ",
+"What is this manager's office number: ",
+"What is this engineer's github username: ",
+"What school did this intern attend: "]
+
+//function used to add Manager
+async function addManager(){
+    const {name} = await inquirer.prompt({
+        message: prompts[0],
+        name: "name"
+    })
+
+    const {id} = await inquirer.prompt({
+        input:"number",
+        message: prompts[1],
+        name: "id"
+    })
+    const {email} = await inquirer.prompt({
+        message: prompts[2],
+        name: "email"
+    })
+    const {officeNumber} = await inquirer.prompt({
+        input:"number",
+        message: prompts[3],
+        name: "officeNumber"
+    })
+    const employee = new Manager(name,id,email,officeNumber);
+    console.log(employee);
+    allManagers.push(employee);
+    allEmployees.push(employee);
+    const {continuer} = await inquirer.prompt({
+        type:"confirm",
+        message:"would you like to add more Managers? ",
+        name: "continuer"
+    })
+    if(continuer=== true){
+        addManager();
+    }
+    if(continuer=== false){
+        const {finished} = await inquirer.prompt({
+            type:"confirm",
+            message:"would you like to add any other employee's? ",
+            name: "finished"
+        })
+        if(finished=== true){
+            init();
+        }
+        if(finished === false){
+            finishedAdding();
+        }
+    }
+}
+
+//function used to add Engineer
+
+async function addEngineer(){
+    const {name} = await inquirer.prompt({
+        message: prompts[0],
+        name: "name"
+    })
+
+    const {id} = await inquirer.prompt({
+        input:"number",
+        message: prompts[1],
+        name: "id"
+    })
+    const {email} = await inquirer.prompt({
+        message: prompts[2],
+        name: "email"
+    })
+    const {github} = await inquirer.prompt({
+        message: prompts[4],
+        name: "github"
+    })
+    const employee = new Engineer(name,id,email,github);
+    console.log(employee);
+    allEngineers.push(employee);
+    allEmployees.push(employee);
+    const {continuer} = await inquirer.prompt({
+        type:"confirm",
+        message:"would you like to add more Engineers?",
+        name: "continuer"
+    })
+    if(continuer=== true){
+        addEngineer();
+    }
+    if(continuer=== false){
+        const {finished} = await inquirer.prompt({
+            type:"confirm",
+            message:"would you like to add any other employee's? ",
+            name: "finished"
+        })
+        if(finished=== true){
+            init();
+        }
+        if(finished === false){
+            finishedAdding();
+        }
+    }
+}
+
+//function used to add Intern
+
+async function addIntern(){
+    const {name} = await inquirer.prompt({
+        message: prompts[0],
+        name: "name"
+    })
+
+    const {id} = await inquirer.prompt({
+        input:"number",
+        message: prompts[1],
+        name: "id"
+    })
+    const {email} = await inquirer.prompt({
+        message: prompts[2],
+        name: "email"
+    })
+    const {school} = await inquirer.prompt({
+        message: prompts[5],
+        name: "school"
+    })
+    const employee = new Intern(name,id,email,school);
+    console.log(employee);
+    allInterns.push(employee);
+    allEmployees.push(employee);
+
+    const {continuer} = await inquirer.prompt({
+        type:"confirm",
+        message:"would you like to add more interns?",
+        name: "continuer"
+    })
+    if(continuer=== true){
+        addIntern();
+    }
+    if(continuer=== false){
+        const {finished} = await inquirer.prompt({
+            type:"confirm",
+            message:"would you like to add any other employee's? ",
+            name: "finished"
+        })
+        if(finished=== true){
+            init();
+        }
+        if(finished === false){
+            finishedAdding();
+        }
+    }
+}
+
+function finishedAdding(){
+    fs.writeFile(outputPath,render(allEmployees), (err) => {
+        if (err) throw err;
+        console.log('The file has been saved!');
+      });
 }
 init();
