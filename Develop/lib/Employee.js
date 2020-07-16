@@ -19,6 +19,5 @@ class Employee {
         return this.email;
     }
 }
-const tester = new Employee("dave",5,"dave@gmail");
-console.log(tester);
+
 module.exports = Employee
